@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+>
+    <?if $(var.Arch) = 386 ?>
+    <?define ProdId = {9ddce371-ae4b-4dea-953e-4584d027ef80} ?>
+    <?define UpgradeCode = {6a467efb-3552-428b-8965-6d709f1c441a} ?>
+    <?define SysFolder=SystemFolder ?>
+    <?define PlatformArch=x86 ?>
+    <?define ProgramFilesDir=ProgramFilesFolder ?>
+    <?else?>
+    <?define ProdId = {9ddce371-ae4b-4dea-953e-4584d027ef80} ?>
+    <?define UpgradeCode = {6a467efb-3552-428b-8965-6d709f1c441a} ?>
+    <?define SysFolder=System64Folder ?>
+    <?define PlatformArch=x64 ?>
+    <?define ProgramFilesDir=ProgramFiles64Folder ?>
+    <?endif?>
+
+    <Product
+            Id="*"
+            Name="$(var.prodName)-$(var.prodVersion)"
+            Language="1033"
+            Version="$(var.WixprodVersion)"
+            Manufacturer="https://wso2.com"
+            UpgradeCode="$(var.UpgradeCode)">
+        <Package
+                Id='*'
+                Keywords='Installer'
+                Description="The $(var.prodName) Installer"
+                Comments="The $(var.prodName)-$(var.prodVersion) Installer."
+                InstallerVersion="300"
+                Compressed="yes"
+                InstallScope="perMachine"
+                Languages="1033"
+                Platform="$(var.PlatformArch)"/>
+
+        <Property Id="ARPCOMMENTS"
+                  Value="$(var.prodName)-$(var.prodVersion) is a WSO2 product."/>
+        <Property Id="ARPCONTACT" Value="https://wso2.com"/>
+        <Property Id="ARPHELPLINK" Value="https://wso2.com"/>
+        <Property Id="ARPREADME" Value="https://wso2.com"/>
+        <Property Id="ARPURLINFOABOUT" Value="https://wso2.com"/>
+       
+        <Media Id='1' Cabinet="$(var.prodName)Environment.cab" EmbedCab="yes" CompressionLevel="high"/>
+        <Condition Message="Windows XP or greater required.">VersionNT >= 500</Condition>
+        <MajorUpgrade AllowDowngrades="yes"/>
+        <SetDirectory Id="INSTALLDIRROOT" Value="[$(var.ProgramFilesDir)]$(var.prodName)"/>
+        <CustomAction
+                Id="SetApplicationRootDirectory"
+                Property="ARPINSTALLLOCATION"
+                Value="[INSTALLDIR]"/>
+        <!-- Define the directory structure and environment variables -->
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="INSTALLDIRROOT">
+                <Directory Id="INSTALLDIR" Name="$(var.prodName)-$(var.prodVersion)">
+                    <Component Id="INSTALLFOLDER_Permission" Guid="{5afe5fb2-55bc-4f96-9778-b79ad00107ae}"> 
+                        <CreateFolder> 
+                            <util:PermissionEx User="Users" GenericAll="yes"/> 
+                        </CreateFolder> 
+                    </Component> 
+                </Directory>
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="$(var.prodName)EnvironmentProgramShortcutsDir" Name="$(var.prodName)-$(var.prodVersion)"/>
+            </Directory>
+            <Directory Id="EnvironmentEntries">
+                <Directory Id="$(var.prodName)EnvironmentEntries" Name="$(var.prodName)-$(var.prodVersion)"/>
+            </Directory>
+        </Directory>
+        <DirectoryRef Id="INSTALLDIR">
+            <Component Id="$(var.prodName).bat" Guid="c367587b-2a48-485d-a156-e2f7f96c5028">
+                <File Id="$(var.prodName).bat" Source="$(var.prodName)-$(var.prodVersion)\bin\$(var.prodName).bat" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+        <!-- Programs Menu Shortcuts -->
+        <DirectoryRef Id="$(var.prodName)EnvironmentProgramShortcutsDir">
+            <Component Id="Component_$(var.prodName)ProgramShortCuts" Guid="{764ee6d4-917f-422c-87cb-cc0fff389765}">
+                <Shortcut Id="ApplicationStartMenuShortcut" 
+                    Name="$(var.prodName)-$(var.prodVersion)" 
+                    Description="$(var.prodName)-$(var.prodVersion)"
+                    Target="[#$(var.prodName).bat]"
+                    WorkingDirectory="INSTALLDIR"/>
+                <Shortcut
+                        Id="UninstallShortcut"
+                        Name="Uninstall $(var.prodName)-$(var.prodVersion)"
+                        Description="Uninstalls $(var.prodName)-$(var.prodVersion)"
+                        Target="[SystemFolder]msiexec.exe"
+                        Arguments="/x [ProductCode]"/>
+                <RemoveFolder
+                        Id="$(var.prodName)EnvironmentProgramShortcutsDir"
+                        On="uninstall"/>
+                <RegistryValue
+                        Root="HKCU"
+                        Key="Software\$(var.prodName)-$(var.prodVersion)"
+                        Name="ShortCuts"
+                        Type="integer"
+                        Value="1"
+                        KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+       
+        <!-- Registry & Environment Settings -->
+        <DirectoryRef Id="$(var.prodName)EnvironmentEntries">
+            <Component Id="Component_$(var.prodName)Environment" Guid="{f9f2e5e9-d6fb-4ef3-8faf-38b5fd283237}">
+                <RegistryKey
+                        Root="HKCU"
+                        Key="Software\$(var.prodName)-$(var.prodVersion)"
+                        Action="create">
+                    <RegistryValue
+                            Name="installed"
+                            Type="integer"
+                            Value="1"
+                            KeyPath="yes"/>
+                    <RegistryValue
+                            Name="installLocation"
+                            Type="string"
+                            Value="[INSTALLDIR]"/>
+                </RegistryKey>
+				<!-- <RegistryKey
+                        Root="HKCR"
+                        Key=".$(var.prodName)\DefaultIcon"
+                        Action="createAndRemoveOnUninstall">
+                    <RegistryValue
+                            Type="string"
+                            Value="[INSTALLDIR]\icons\prodo-teal.ico"/>
+                </RegistryKey>
+				<RegistryKey
+                        Root="HKCR"
+                        Key=".prodx\DefaultIcon"
+                        Action="createAndRemoveOnUninstall">
+                    <RegistryValue
+                            Type="string"
+                            Value="[INSTALLDIR]\icons\prodx-teal.ico"/>
+                </RegistryKey>
+				<RegistryKey
+                        Root="HKCR"
+                        Key=".prod\DefaultIcon"
+                        Action="createAndRemoveOnUninstall">
+                    <RegistryValue
+                            Type="string"
+                            Value="[INSTALLDIR]\icons\prod-teal.ico"/>
+                </RegistryKey> -->
+                <Environment
+                        Id="$(var.prodName)Home"
+                        Action="set"
+                        Part="all"
+                        Name="$(var.prodName)_HOME"
+                        Permanent="no"
+                        System="yes"
+                        Value="[INSTALLDIR]"/>
+                <Environment
+                        Id="$(var.prodName)EnvironmentPathEntry"
+                        Action="set"
+                        Part="last"
+                        Name="PATH"
+                        Permanent="no"
+                        System="yes"
+                        Value="%$(var.prodName)_HOME%\bin"/>
+                <RemoveFolder
+                        Id="$(var.prodName)EnvironmentEntries"
+                        On="uninstall"/>
+            </Component>
+        </DirectoryRef>
+        <!-- Install the files -->
+        <Feature
+                Id="$(var.prodName)Tools"
+                Title="$(var.prodName)"
+                Level="1">
+            <ComponentRef Id="$(var.prodName).bat"/>
+            <ComponentRef Id="Component_$(var.prodName)Environment"/>
+            <ComponentGroupRef Id="AppFiles"/>
+            <ComponentRef Id="Component_$(var.prodName)ProgramShortCuts"/>
+            <ComponentRef Id="INSTALLFOLDER_Permission"/>
+        </Feature>
+
+        <UI>
+            <UIRef Id="WixUI_InstallDir"/>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">NOT Installed</Publish>
+            <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">1</Publish>
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="PrepareDlg" Order="5">
+                WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"
+            </Publish>
+            <Publish Dialog="ExitDialog" 
+                Control="Finish" 
+                Event="DoAction" 
+                Value="LaunchApplication">
+                WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed
+            </Publish>
+        </UI>
+
+        <!-- Update the environment -->
+        <InstallExecuteSequence>
+            <Custom Action="SetApplicationRootDirectory" Before="InstallFinalize"/>
+        </InstallExecuteSequence>
+        <!-- Include the user interface -->
+        <WixVariable Id="WixUIBannerBmp" Value="resources/Banner.jpg"/>
+        <WixVariable Id="WixUIDialogBmp" Value="resources/Dialog.jpg"/>
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(var.prodName)-$(var.prodVersion)" />
+
+        <Property Id="WixShellExecTarget" Value="[#$(var.prodName).bat]" />
+        <CustomAction Id="LaunchApplication" ExeCommand="[INSTALLDIR]$(var.prodName).bat"
+            Directory="INSTALLDIR" Execute="deferred" Return="asyncWait"/>
+    </Product>
+</Wix>
