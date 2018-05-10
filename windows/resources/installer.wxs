@@ -78,7 +78,7 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
                 <Shortcut Id="ApplicationStartMenuShortcut" 
                     Name="$(var.prodName)-$(var.prodVersion)" 
                     Description="$(var.prodName)-$(var.prodVersion)"
-                    Target="[#$(var.prodName).bat]"
+                    Target="[INSTALLDIR]bin\$(var.prodName).bat"
                     WorkingDirectory="INSTALLDIR"/>
                 <Shortcut
                         Id="UninstallShortcut"
@@ -198,8 +198,12 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(var.prodName)-$(var.prodVersion)" />
 
-        <Property Id="WixShellExecTarget" Value="[#$(var.prodName).bat]" />
-        <CustomAction Id="LaunchApplication" ExeCommand="[INSTALLDIR]$(var.prodName).bat"
-            Directory="INSTALLDIR" Execute="deferred" Return="asyncWait"/>
+        <Property Id="WixShellExecTarget" Value="[INSTALLDIR]bin\$(var.prodName).bat" />
+        <!-- <CustomAction Id="LaunchApplication" ExeCommand="[INSTALLDIR]$(var.prodName).bat"
+            Directory="INSTALLDIR" Execute="immediate" Return="ignore"/> -->
+        <CustomAction Id="LaunchApplication" 
+            BinaryKey="WixCA" 
+            DllEntry="WixShellExec"
+            Impersonate="yes" />
     </Product>
 </Wix>

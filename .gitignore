@@ -1,6 +1,3 @@
-resources/wix/*
-target/*
-
 # Compiled class file
 
 *.class
