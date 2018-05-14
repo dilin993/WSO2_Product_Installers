@@ -31,15 +31,15 @@ case ${key} in
     shift # past value
     ;;
     -p|--path)
-    DIST_PATH="$2"
+    PROD_PATH="$2"
     shift # past argument
     shift # past value
     ;;
-    -d|--dist)
-    DISTRIBUTION="$2"
-    shift # past argument
-    shift # past value
-    ;;
+    # -d|--dist)
+    # DISTRIBUTION="$2"
+    # shift # past argument
+    # shift # past value
+    # ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -53,7 +53,7 @@ if [ -z "$PRODUCT_VERSION" ]; then
     exit 1
 fi
 
-if [ -z "$DIST_PATH" ]; then
+if [ -z "$PROD_PATH" ]; then
     echo "Please enter the path of the product packs"
     printUsage
     exit 1
@@ -66,11 +66,12 @@ fi
 
 
 
-PRODUCT_DISTRIBUTION_LOCATION=${DIST_PATH}
+PRODUCT_DISTRIBUTION_LOCATION=${PROD_PATH}
 PRODUCT_INSTALL_DIRECTORY=${PRODUCT}-${PRODUCT_VERSION}
+PRODUCT_NAME=${PRODUCT}-${PRODUCT_VERSION}
 SPEC_FILE="installer.spec"
-SPEC_FILE_LOCATION="rpmbuild/SPECS/"
-SPEC_FILE_LOC=${SPEC_FILE_LOCATION}/${SPEC_FILE}
+SPEC_DIRECTORY="rpmbuild/SPECS/"
+SPEC_FILE_LOC=${SPEC_DIRECTORY}/${SPEC_FILE}
 RPM_PRODUCT_VERSION=$(echo "${PRODUCT_VERSION//-/.}")
 
 echo "Build started at" $(date +"%Y-%m-%d %H:%M:%S")
@@ -93,9 +94,11 @@ function extractPack() {
 function setupInstaller() {
     sed -i "/Version:/c\Version:        ${RPM_PRODUCT_VERSION}" ${SPEC_FILE_LOC}
     sed -i "/%define _product_version/c\%define _product_version ${PRODUCT_VERSION}" ${SPEC_FILE_LOC}
-    sed -i "/%define _PRODUCT_tools_dir/c\%define _PRODUCT_tools_dir ${PRODUCT_RUNTIME}" ${SPEC_FILE_LOC}
-    sed -i "s/export PRODUCT_HOME=/export PRODUCT_HOME=\/usr\/lib64\/PRODUCT\/PRODUCT-runtime-${PRODUCT_VERSION}/" ${SPEC_FILE_LOC}
-    sed -i "s?SED_PRODUCT_HOME?/usr/lib64/PRODUCT/PRODUCT-runtime-${PRODUCT_VERSION}?" ${SPEC_FILE_LOC}
+    sed -i "/%define _product_install_directory/c\%define _product_install_directory ${PRODUCT_INSTALL_DIRECTORY}" ${SPEC_FILE_LOC}
+    sed -i "/%define _product/c\%define _product ${PRODUCT}" ${SPEC_FILE_LOC}
+    sed -i "/%define _product_name/c\%define _product_name ${PRODUCT}-${PRODUCT_VERSION}" ${SPEC_FILE_LOC}
+    # sed -i "s/export PRODUCT_HOME=/export PRODUCT_HOME=\/usr\/lib64\/PRODUCT\/PRODUCT-runtime-${PRODUCT_VERSION}/" ${SPEC_FILE_LOC}
+    # sed -i "s?SED_PRODUCT_HOME?/usr/lib64/PRODUCT/PRODUCT-runtime-${PRODUCT_VERSION}?" ${SPEC_FILE_LOC}
 }
 
 # Set variables in SPEC file
@@ -109,12 +112,11 @@ function setupInstaller() {
 
 function createInstaller() {
     echo "Creating PRODUCT platform installer"
-    extractPack "$PRODUCT_DISTRIBUTION_LOCATION/$PRODUCT_PLATFORM.zip"
-    [ -f ${PLATFORM_SPEC_FILE_LOC} ] && rm -f ${PLATFORM_SPEC_FILE_LOC}
-    cp resources/${PLATFORM_SPEC_FILE} ${SPEC_FILE_LOCATION}
+    extractPack "$PRODUCT_DISTRIBUTION_LOCATION/$PRODUCT_NAME.zip"
+    [ -f ${SPEC_FILE_LOC} ] && rm -f ${SPEC_FILE_LOC}
+    cp resources/${SPEC_FILE} ${SPEC_DIRECTORY}
     setupInstaller
-    rpmbuild -bb --define "_topdir  $(pwd)/rpmbuild" ${PLATFORM_SPEC_FILE_LOC}
-
+    rpmbuild -bb --define "_topdir  $(pwd)/rpmbuild" ${SPEC_FILE_LOC}
 }
 
 

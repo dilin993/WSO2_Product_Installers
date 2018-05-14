@@ -1,6 +1,7 @@
-%define _ballerina_name ballerina
+%define _product_name
 %define _product_version
-%define _ballerina_tools_dir
+# %define _product_install_directory
+%define _product
 
 Name:           %{_product}
 Version:        
@@ -24,23 +25,23 @@ rm -f /usr/bin/%{_product}> /dev/null 2>&1
 
 %prep
 rm -rf %{_topdir}/BUILD/*
-cp -r %{_topdir}/SOURCES/%{_ballerina_tools_dir}/* %{_topdir}/BUILD/
+cp -r %{_topdir}/SOURCES/%{_product_name}/* %{_topdir}/BUILD/
 %build
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d %{buildroot}%{_libdir}/ballerina/%{_ballerina_name}-runtime-%{_product_version}
-cp -r bin bre lib src %{buildroot}%{_libdir}/ballerina/%{_ballerina_name}-runtime-%{_product_version}/
+install -d %{buildroot}%{_libdir}/%{_product}/%{_product_name}
+cp -r bin bre lib src %{buildroot}%{_libdir}//%{_product}/%{_product_name}
 
 %post
-ln -sf %{_libdir}/ballerina/%{_ballerina_name}-runtime-%{_product_version}/bin/ballerina /usr/bin/%{_ballerina_name}
-echo 'export BALLERINA_HOME=' >> /etc/profile.d/wso2.sh
-chmod 0755 /etc/profile.d/wso2.sh
+ln -sf %{_libdir}/%{_product}/%{_product_name}/bin/wso2server.sh /usr/bin/%{_product}
+# echo 'export BALLERINA_HOME=' >> /etc/profile.d/wso2.sh
+# chmod 0755 /etc/profile.d/wso2.sh
 
 %postun
-sed -i.bak '\:SED_BALLERINA_HOME:d' /etc/profile.d/wso2.sh
-if [ "$(readlink /usr/bin/ballerina)" = "%{_libdir}/ballerina/ballerina-runtime-%{_product_version}/bin/ballerina" ]
+# sed -i.bak '\:SED_BALLERINA_HOME:d' /etc/profile.d/wso2.sh
+if [ "$(readlink /usr/bin/%{_product})" = "%{_libdir}/%{_product}/%{_product_name}/bin/wso2server.sh" ]
 then
-  rm -f /usr/bin/ballerina
+  rm -f /usr/bin/%{_product}
 fi
 
 %clean
@@ -48,5 +49,5 @@ rm -rf %{_topdir}/BUILD/*
 rm -rf %{buildroot}
 
 %files
-%{_libdir}/ballerina/%{_ballerina_name}-runtime-%{_product_version}
+%{_libdir}/%{_product}/%{_product_name}
 %doc COPYRIGHT LICENSE README
