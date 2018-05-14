@@ -95,8 +95,8 @@ function extractPack() {
 function setupInstaller() {
     sed -i "/Version:/c\Version:        ${RPM_PRODUCT_VERSION}" ${SPEC_FILE_LOC}
     sed -i "/%define _product_version/c\%define _product_version ${PRODUCT_VERSION}" ${SPEC_FILE_LOC}
-    sed -i "/%define _product_install_directory/c\%define _product_install_directory ${PRODUCT_INSTALL_DIRECTORY}" ${SPEC_FILE_LOC}
-    sed -i "/%define _product/c\%define _product ${PRODUCT}" ${SPEC_FILE_LOC}
+    # sed -i "/%define _product_install_directory/c\%define _product_install_directory ${PRODUCT_INSTALL_DIRECTORY}" ${SPEC_FILE_LOC}
+    sed -i "/%define _product__/c\%define _product__ ${PRODUCT}" ${SPEC_FILE_LOC}
     sed -i "/%define _product_name/c\%define _product_name ${PRODUCT}-${PRODUCT_VERSION}" ${SPEC_FILE_LOC}
     # sed -i "s/export PRODUCT_HOME=/export PRODUCT_HOME=\/usr\/lib64\/PRODUCT\/PRODUCT-runtime-${PRODUCT_VERSION}/" ${SPEC_FILE_LOC}
     # sed -i "s?SED_PRODUCT_HOME?/usr/lib64/PRODUCT/PRODUCT-runtime-${PRODUCT_VERSION}?" ${SPEC_FILE_LOC}
