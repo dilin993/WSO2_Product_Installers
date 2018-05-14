@@ -1,5 +1,4 @@
 #!/bin/bash
-PRODUCT="wso2am"
 
 function printUsage() {
     echo "Usage:"
@@ -9,13 +8,8 @@ function printUsage() {
     echo "        version of the product distribution"
     echo "    -p (--path)"
     echo "        path of the product distributions"
-    # echo "    -d (--dist)"
-    # echo "        PRODUCT distribution type either of the followings"
-    # echo "        If not specified both distributions will be built"
-    # echo "        1. PRODUCT-platform"
-    # echo "        2. PRODUCT-runtime"
-    # echo "eg: $0 -v 1.0.0 -p /home/username/Packs"
-    # echo "eg: $0 -v 1.0.0 -p /home/username/Packs -d PRODUCT-platform"
+    echo "    -n (--name)"
+    echo "        name of the product distribution"
 }
 
 BUILD_ALL_DISTRIBUTIONS=false
@@ -35,11 +29,11 @@ case ${key} in
     shift # past argument
     shift # past value
     ;;
-    # -d|--dist)
-    # DISTRIBUTION="$2"
-    # shift # past argument
-    # shift # past value
-    # ;;
+    -n|--name)
+    PRODUCT="$2"
+    shift # past argument
+    shift # past value
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -59,11 +53,15 @@ if [ -z "$PROD_PATH" ]; then
     exit 1
 fi
 
+if [ -z "$PRODUCT" ]; then
+    echo "Please enter the name of the product."
+    printUsage
+    exit 1
+fi
+
 # if [ -z "$DISTRIBUTION" ]; then
 #     BUILD_ALL_DISTRIBUTIONS=true
 # fi
-
-
 
 
 PRODUCT_DISTRIBUTION_LOCATION=${PROD_PATH}

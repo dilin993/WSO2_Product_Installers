@@ -1,19 +1,15 @@
 #!/bin/bash
 
-PRODUCT="wso2am"
-
 function printUsage() {
     echo "Usage:"
     echo "$0 [options]"
     echo "options:"
     echo "    -v (--version)"
-    echo "        version of the ${PRODUCT} distribution"
+    echo "        version of the product distribution"
     echo "    -p (--path)"
-    echo "        path of the ${PRODUCT} distribution"
-    # echo "    -j (--jdk)"
-    # echo "        path of the jdk zip archive"
-    # echo "eg: $0 -v 1.0.0 -p /home/username/Packs"
-    # echo "eg: $0 -v 1.0.0 -p /home/username/Packs -d ballerina-platform"
+    echo "        path of the product distribution"
+    echo "    -n (--name)"
+    echo "        name of the product distribution"
 }
 
 POSITIONAL=()
@@ -32,11 +28,11 @@ case ${key} in
     shift # past argument
     shift # past value
     ;;
-    # -j|--jdk)
-    # JDK_PATH="$2"
-    # shift # past argument
-    # shift # past value
-    # ;;
+    -n|--name)
+    PRODUCT="$2"
+    shift # past argument
+    shift # past value
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -45,22 +41,22 @@ esac
 done
 
 if [ -z "$PRODUCT_VERSION" ]; then
-    echo "Please enter the version of the ${PRODUCT} pack"
+    echo "Please enter the version of the product."
+    printUsage
+    exit 1
+fi
+
+if [ -z "$PRODUCT" ]; then
+    echo "Please enter the name of the product."
     printUsage
     exit 1
 fi
 
 if [ -z "$DIST_PATH" ]; then
-    echo "Please enter the path of the ${PRODUCT} pack"
+    echo "Please enter the path of the product."
     printUsage
     exit 1
 fi
-
-# if [ -z "$JDK_PATH" ]; then
-#     echo "Please enter the path of the JDK zip archive"
-#     printUsage
-#     exit 1
-# fi
 
 PRODUCT_DISTRIBUTION_LOCATION=${DIST_PATH}
 echo $PRODUCT_DISTRIBUTION_LOCATION
@@ -81,8 +77,6 @@ function extractPack() {
     rm -rf target/original
     mkdir -p target/original
     unzip $1 -d target/original
-    # unzip $3 -d target/original/$2
-    # mv target/original/$2 target/original/${PRODUCT_INSTALL_DIRECTORY}
 }
 
 function createPackInstallationDirectory() {
@@ -108,7 +102,7 @@ function copyDebianDirectory() {
 function createInstaller() {
     echo "Creating ${PRODUCT} platform installer"
 
-    extractPack "$PRODUCT_DISTRIBUTION_LOCATION/$PRODUCT_NAME.zip" ${PRODUCT_NAME} #${JDK_PATH}
+    extractPack "$PRODUCT_DISTRIBUTION_LOCATION/$PRODUCT_NAME.zip" ${PRODUCT_NAME}
     createPackInstallationDirectory
     copyDebianDirectory
     mv target/${PRODUCT_INSTALL_DIRECTORY} target/${PRODUCT_NAME}-linux-installer-x64
