@@ -81,6 +81,7 @@ function extractPack() {
     rm -rf rpmbuild/SOURCES
     mkdir -p rpmbuild/SOURCES
     unzip $1 -d rpmbuild/SOURCES/ > /dev/null 2>&1
+    echo "Extracting completed!, " $1
 }
 
 # Set variables in SPEC file
