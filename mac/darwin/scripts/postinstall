@@ -1,0 +1,11 @@
+#!/bin/bash
+PRODUCTROOT=/Library/__PRODUCT__/__PRODUCT__-__PRODUCT_VERSION__
+echo "Fixing permissions"
+cd $PRODUCTROOT
+#find . -exec chmod ugo+r \{\} \;
+#find bin -exec chmod ugo+rwx \{\} \;
+#find . -type d -exec chmod ugo+rx \{\} \;
+#chmod o-w .
+chmod -R ugo+rwx .
+[ -d /usr/local/bin ] || mkdir /usr/local/bin
+ln -s $PRODUCTROOT/bin/wso2server.sh /usr/local/bin/__PRODUCT__
