@@ -18,7 +18,7 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
 
     <Product
             Id="*"
-            Name="$(var.prodName)-$(var.prodVersion)"
+            Name="WSO2 $(var.prodTitle) $(var.prodVersion)"
             Language="1033"
             Version="$(var.WixprodVersion)"
             Manufacturer="https://wso2.com"
@@ -26,8 +26,8 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
         <Package
                 Id='*'
                 Keywords='Installer'
-                Description="The $(var.prodName) Installer"
-                Comments="The $(var.prodName)-$(var.prodVersion) Installer."
+                Description="The WSO2 $(var.prodTitle) $(var.prodVersion) Installer"
+                Comments="The WSO2 $(var.prodTitle) $(var.prodVersion) Installer."
                 InstallerVersion="300"
                 Compressed="yes"
                 InstallScope="perMachine"
@@ -35,7 +35,7 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
                 Platform="$(var.PlatformArch)"/>
 
         <Property Id="ARPCOMMENTS"
-                  Value="$(var.prodName)-$(var.prodVersion) is a WSO2 product."/>
+                  Value="WSO2 $(var.prodTitle) $(var.prodVersion)"/>
         <Property Id="ARPCONTACT" Value="https://wso2.com"/>
         <Property Id="ARPHELPLINK" Value="https://wso2.com"/>
         <Property Id="ARPREADME" Value="https://wso2.com"/>
@@ -44,7 +44,7 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
         <Media Id='1' Cabinet="$(var.prodName)Environment.cab" EmbedCab="yes" CompressionLevel="high"/>
         <Condition Message="Windows XP or greater required.">VersionNT >= 500</Condition>
         <MajorUpgrade AllowDowngrades="yes"/>
-        <SetDirectory Id="INSTALLDIRROOT" Value="[$(var.ProgramFilesDir)]$(var.prodName)"/>
+        <SetDirectory Id="INSTALLDIRROOT" Value="[$(var.ProgramFilesDir)]WSO2\$(var.prodTitle)"/>
         <CustomAction
                 Id="SetApplicationRootDirectory"
                 Property="ARPINSTALLLOCATION"
@@ -52,7 +52,7 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
         <!-- Define the directory structure and environment variables -->
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="INSTALLDIRROOT">
-                <Directory Id="INSTALLDIR" Name="$(var.prodName)-$(var.prodVersion)">
+                <Directory Id="INSTALLDIR" Name="$(var.prodVersion)">
                     <Component Id="INSTALLFOLDER_Permission" Guid="{5afe5fb2-55bc-4f96-9778-b79ad00107ae}"> 
                         <CreateFolder> 
                             <util:PermissionEx User="Users" GenericAll="yes"/> 
@@ -61,34 +61,59 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
                 </Directory>
             </Directory>
             <Directory Id="ProgramMenuFolder">
-                <Directory Id="$(var.prodName)EnvironmentProgramShortcutsDir" Name="$(var.prodName)-$(var.prodVersion)"/>
+                <Directory Id="PROG_WSO2_DIR" Name="WSO2">
+                    <Component Id="PMENU_WSO2_DIR" Guid="{9a7cbd96-3629-431f-b71c-30066fa8aad4}"> 
+                        <CreateFolder/>
+                        <RemoveFolder
+                                Id="RemovePROG_WSO2_DIR"
+                                On="uninstall"/>
+                        <RegistryValue
+                            Root="HKCU"
+                            Name="WSO2Dir"
+                            Key="Software\$(var.prodName)-$(var.prodVersion)"
+                            Type="integer"
+                            Value="1"
+                            KeyPath="yes"/>
+                    </Component>
+                    <Directory Id="PROG_PROD" Name="$(var.prodTitle)">
+                        <Component Id="PMENU_PROG_PROD" Guid="{fc1327fd-ba74-4614-be4c-5f22aa02b486}"> 
+                            <CreateFolder/>
+                            <RemoveFolder
+                                Id="RemovePROG_PROD"
+                                On="uninstall"/>
+                            <RegistryValue
+                            Root="HKCU"
+                            Name="ProdDir"
+                            Key="Software\$(var.prodName)-$(var.prodVersion)"
+                            Type="integer"
+                            Value="1"
+                            KeyPath="yes"/>
+                        </Component>
+                        <Directory Id="$(var.prodName)EnvironmentProgramShortcutsDir" Name="$(var.prodVersion)"/>
+                    </Directory>
+                </Directory>
             </Directory>
             <Directory Id="EnvironmentEntries">
                 <Directory Id="$(var.prodName)EnvironmentEntries" Name="$(var.prodName)-$(var.prodVersion)"/>
             </Directory>
         </Directory>
-        <DirectoryRef Id="INSTALLDIR">
-            <Component Id="$(var.prodName).bat" Guid="c367587b-2a48-485d-a156-e2f7f96c5028">
-                <File Id="$(var.prodName).bat" Source="$(var.prodName)-$(var.prodVersion)\bin\$(var.prodName).bat" KeyPath="yes" Checksum="yes"/>
-            </Component>
-        </DirectoryRef>
+        
         <!-- Programs Menu Shortcuts -->
         <DirectoryRef Id="$(var.prodName)EnvironmentProgramShortcutsDir">
-            <Component Id="Component_$(var.prodName)ProgramShortCuts" Guid="{764ee6d4-917f-422c-87cb-cc0fff389765}">
+            <Component Id="Component_$(var.prodName)ProgramShortCuts" Guid="{d517dd03-b662-42f3-b50e-2c0fe31054e8}">
                 <Shortcut Id="ApplicationStartMenuShortcut" 
-                    Name="$(var.prodName)-$(var.prodVersion)" 
-                    Description="$(var.prodName)-$(var.prodVersion)"
-                    Target="[INSTALLDIR]bin\$(var.prodName).bat"
+                    Name="$(var.prodTitle) $(var.prodVersion)" 
+                    Description="WSO2 $(var.prodTitle) $(var.prodVersion)"
+                    Target="[INSTALLDIR]bin\$(var.prodName)-$(var.prodVersion).bat"
                     WorkingDirectory="INSTALLDIR"/>
                 <Shortcut
                         Id="UninstallShortcut"
-                        Name="Uninstall $(var.prodName)-$(var.prodVersion)"
-                        Description="Uninstalls $(var.prodName)-$(var.prodVersion)"
+                        Name="Uninstall $(var.prodTitle) $(var.prodVersion)"
+                        Description="Uninstalls WSO2 $(var.prodTitle) $(var.prodVersion)"
                         Target="[SystemFolder]msiexec.exe"
                         Arguments="/x [ProductCode]"/>
-                <RemoveFolder
-                        Id="$(var.prodName)EnvironmentProgramShortcutsDir"
-                        On="uninstall"/>
+                <RemoveFolder Id="Remove$(var.prodName)EnvironmentProgramShortcutsDir"
+							  On="uninstall" />
                 <RegistryValue
                         Root="HKCU"
                         Key="Software\$(var.prodName)-$(var.prodVersion)"
@@ -157,7 +182,8 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
                         System="yes"
                         Value="%$(var.prodName)_HOME%\bin"/>
                 <RemoveFolder
-                        Id="$(var.prodName)EnvironmentEntries"
+                        Id="Remove$(var.prodName)EnvironmentEntries"
+                        Directory="$(var.prodName)EnvironmentEntries"
                         On="uninstall"/>
             </Component>
         </DirectoryRef>
@@ -166,11 +192,12 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
                 Id="$(var.prodName)Tools"
                 Title="$(var.prodName)"
                 Level="1">
-            <ComponentRef Id="$(var.prodName).bat"/>
             <ComponentRef Id="Component_$(var.prodName)Environment"/>
             <ComponentGroupRef Id="AppFiles"/>
             <ComponentRef Id="Component_$(var.prodName)ProgramShortCuts"/>
             <ComponentRef Id="INSTALLFOLDER_Permission"/>
+            <ComponentRef Id="PMENU_WSO2_DIR"/>
+            <ComponentRef Id="PMENU_PROG_PROD"/>
         </Feature>
 
         <UI>
@@ -196,11 +223,11 @@ xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
         <WixVariable Id="WixUIBannerBmp" Value="resources/Banner.jpg"/>
         <WixVariable Id="WixUIDialogBmp" Value="resources/Dialog.jpg"/>
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
-        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(var.prodName)-$(var.prodVersion)" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch WSO2 $(var.prodTitle) $(var.prodVersion)" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXX" Value="50" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXY" Value="50" />
 
-        <Property Id="WixShellExecTarget" Value="[INSTALLDIR]bin\$(var.prodName).bat" />
-        <!-- <CustomAction Id="LaunchApplication" ExeCommand="[INSTALLDIR]$(var.prodName).bat"
-            Directory="INSTALLDIR" Execute="immediate" Return="ignore"/> -->
+        <Property Id="WixShellExecTarget" Value="[INSTALLDIR]bin\$(var.prodName)-$(var.prodVersion).bat" />
         <CustomAction Id="LaunchApplication" 
             BinaryKey="WixCA" 
             DllEntry="WixShellExec"
