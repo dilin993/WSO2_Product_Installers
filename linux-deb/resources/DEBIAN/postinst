@@ -1,3 +1,3 @@
-ln -s /opt/__PRODUCT__/__PRODUCT__-__PRODUCT_VERSION__/bin/wso2server.sh /usr/bin/__PRODUCT__
+ln -s /usr/lib/WSO2/__TITLE__/__PRODUCT_VERSION__/bin/wso2server.sh /usr/bin/__PRODUCT__-__PRODUCT_VERSION__
 
 

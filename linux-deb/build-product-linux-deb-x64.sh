@@ -10,6 +10,8 @@ function printUsage() {
     echo "        path of the product distribution"
     echo "    -n (--name)"
     echo "        name of the product distribution"
+    echo "    -t (--title)"
+    echo "        title of the product distribution"
 }
 
 POSITIONAL=()
@@ -33,6 +35,11 @@ case ${key} in
     shift # past argument
     shift # past value
     ;;
+    -t|--title)
+    TITLE="$2"
+    shift # past argument
+    shift # past value
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -48,6 +55,12 @@ fi
 
 if [ -z "$PRODUCT" ]; then
     echo "Please enter the name of the product."
+    printUsage
+    exit 1
+fi
+
+if [ -z "$TITLE" ]; then
+    echo "Please enter the title of the product."
     printUsage
     exit 1
 fi
@@ -80,11 +93,11 @@ function extractPack() {
 }
 
 function createPackInstallationDirectory() {
-    rm -rf target/${PRODUCT_INSTALL_DIRECTORY}/opt/${PRODUCT}
-    mkdir -p target/${PRODUCT_INSTALL_DIRECTORY}/opt/${PRODUCT}
+    rm -rf target/${PRODUCT_INSTALL_DIRECTORY}/usr/lib/WSO2/${TITLE}/${PRODUCT_VERSION}
+    mkdir -p target/${PRODUCT_INSTALL_DIRECTORY}/usr/lib/WSO2/${TITLE}/${PRODUCT_VERSION}
     mkdir -p target/${PRODUCT_INSTALL_DIRECTORY}/usr/share/${PRODUCT}
-    mv target/original/${PRODUCT_INSTALL_DIRECTORY} target/${PRODUCT_INSTALL_DIRECTORY}/opt/${PRODUCT}
-    chmod -R o+w target/${PRODUCT_INSTALL_DIRECTORY}/opt/${PRODUCT}
+    mv target/original/${PRODUCT_INSTALL_DIRECTORY}/* target/${PRODUCT_INSTALL_DIRECTORY}/usr/lib/WSO2/${TITLE}/${PRODUCT_VERSION}
+    chmod -R o+w target/${PRODUCT_INSTALL_DIRECTORY}/usr/lib/WSO2/${TITLE}/${PRODUCT_VERSION}
 }
 
 function copyDebianDirectory() {
@@ -93,10 +106,12 @@ function copyDebianDirectory() {
     cp resources/copyright target/${PRODUCT_INSTALL_DIRECTORY}/usr/share/${PRODUCT}
     sed -i -e 's/__PRODUCT_VERSION__/'${PRODUCT_VERSION}'/g' target/${PRODUCT_INSTALL_DIRECTORY}/DEBIAN/postinst
     sed -i -e 's/__PRODUCT__/'${PRODUCT}'/g' target/${PRODUCT_INSTALL_DIRECTORY}/DEBIAN/postinst
+    sed -i -e 's/__TITLE__/'${TITLE}'/g' target/${PRODUCT_INSTALL_DIRECTORY}/DEBIAN/postinst
     sed -i -e 's/__PRODUCT_VERSION__/'${PRODUCT_VERSION}'/g' target/${PRODUCT_INSTALL_DIRECTORY}/DEBIAN/postrm
     sed -i -e 's/__PRODUCT__/'${PRODUCT}'/g' target/${PRODUCT_INSTALL_DIRECTORY}/DEBIAN/postrm
     sed -i -e 's/__PRODUCT_VERSION__/'${PRODUCT_VERSION}'/g' target/${PRODUCT_INSTALL_DIRECTORY}/DEBIAN/control
     sed -i -e 's/__PRODUCT__/'${PRODUCT}'/g' target/${PRODUCT_INSTALL_DIRECTORY}/DEBIAN/control
+    sed -i -e 's/__TITLE__/'${TITLE}'/g' target/${PRODUCT_INSTALL_DIRECTORY}/DEBIAN/control
 }
 
 function createInstaller() {

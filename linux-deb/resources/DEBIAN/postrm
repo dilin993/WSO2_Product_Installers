@@ -1,2 +1,2 @@
-sudo rm /usr/bin/__PRODUCT__
+sudo rm /usr/bin/__PRODUCT__-__PRODUCT_VERSION__
 

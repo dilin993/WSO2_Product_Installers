@@ -10,6 +10,8 @@ function printUsage() {
     echo "        path of the product distributions"
     echo "    -n (--name)"
     echo "        name of the product distribution"
+    echo "    -t (--title)"
+    echo "        title of the product distribution"
 }
 
 BUILD_ALL_DISTRIBUTIONS=false
@@ -31,6 +33,11 @@ case ${key} in
     ;;
     -n|--name)
     PRODUCT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -t|--title)
+    TITLE="$2"
     shift # past argument
     shift # past value
     ;;
@@ -59,13 +66,18 @@ if [ -z "$PRODUCT" ]; then
     exit 1
 fi
 
+if [ -z "$TITLE" ]; then
+    echo "Please enter the title of the product."
+    printUsage
+    exit 1
+fi
+
 # if [ -z "$DISTRIBUTION" ]; then
 #     BUILD_ALL_DISTRIBUTIONS=true
 # fi
 
 
 PRODUCT_DISTRIBUTION_LOCATION=${PROD_PATH}
-PRODUCT_INSTALL_DIRECTORY=${PRODUCT}-${PRODUCT_VERSION}
 PRODUCT_NAME=${PRODUCT}-${PRODUCT_VERSION}
 SPEC_FILE="installer.spec"
 SPEC_DIRECTORY="rpmbuild/SPECS/"
@@ -93,11 +105,9 @@ function extractPack() {
 function setupInstaller() {
     sed -i "/Version:/c\Version:        ${RPM_PRODUCT_VERSION}" ${SPEC_FILE_LOC}
     sed -i "/%define _product_version/c\%define _product_version ${PRODUCT_VERSION}" ${SPEC_FILE_LOC}
-    # sed -i "/%define _product_install_directory/c\%define _product_install_directory ${PRODUCT_INSTALL_DIRECTORY}" ${SPEC_FILE_LOC}
+    sed -i "/%define _title__/c\%define _title__ ${TITLE}" ${SPEC_FILE_LOC}
     sed -i "/%define _product__/c\%define _product__ ${PRODUCT}" ${SPEC_FILE_LOC}
     sed -i "/%define _product_name/c\%define _product_name ${PRODUCT}-${PRODUCT_VERSION}" ${SPEC_FILE_LOC}
-    # sed -i "s/export PRODUCT_HOME=/export PRODUCT_HOME=\/usr\/lib64\/PRODUCT\/PRODUCT-runtime-${PRODUCT_VERSION}/" ${SPEC_FILE_LOC}
-    # sed -i "s?SED_PRODUCT_HOME?/usr/lib64/PRODUCT/PRODUCT-runtime-${PRODUCT_VERSION}?" ${SPEC_FILE_LOC}
 }
 
 # Set variables in SPEC file

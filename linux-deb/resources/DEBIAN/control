@@ -1,7 +1,7 @@
-Package: __PRODUCT__-__PRODUCT_VERSION__
+Package: __PRODUCT__-__PRODUCT_VERSION__ 
 Architecture: amd64
 Version: __PRODUCT_VERSION__
 Maintainer: WSO2 Inc. <admin@wso2.com>
 Installed-Size: 889000
-Description: __PRODUCT__
+Description: WSO2 __TITLE__ __PRODUCT_VERSION__
 
