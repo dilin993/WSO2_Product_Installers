@@ -78,7 +78,7 @@ set PRODDIST=%PRODUCT%-%PRODUCT_VERSION%
 echo Product Version: %PRODDIST%"
 set PRODPARCH=x64
 set INSTALLERPARCH=amd64
-set MSI=%PRODUCT%-%PRODUCT_VERSION%-installer-%PRODPARCH%.msi
+set MSI=%PRODUCT%-windows-installer-%PRODPARCH%-%PRODUCT_VERSION%.msi
 call :createInstaller
 goto EOF
 

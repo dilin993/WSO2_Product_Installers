@@ -153,8 +153,8 @@ function createInstaller() {
     extractPack "$PRODUCT_DISTRIBUTION_LOCATION/$PRODUCT-$PRODUCT_VERSION.zip" ${PRODUCT_DIRECTORY}
     createPackInstallationDirectory
     buildPackage
-    buildProduct $PRODUCT-$PRODUCT_VERSION-macos-installer-x64.pkg
-    signProduct $PRODUCT-$PRODUCT_VERSION-macos-installer-x64.pkg
+    buildProduct $PRODUCT-macos-installer-x64-$PRODUCT_VERSION.pkg
+    signProduct $PRODUCT-macos-installer-x64-$PRODUCT_VERSION.pkg
 }
 
 deleteTargetDirectory

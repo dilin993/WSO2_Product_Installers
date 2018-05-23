@@ -14,7 +14,7 @@ URL:            https://www.wso2.com/
 # Disable Automatic Dependencies
 AutoReqProv: no
 # Override RPM file name
-%define _rpmfilename %%{ARCH}/%{_product__}-%{_product_version}-runtime-linux-installer-x64-%{_product_version}.rpm
+%define _rpmfilename %%{ARCH}/%{_product__}-linux-installer-x64-%{_product_version}.rpm
 # Disable Jar repacking
 %define __jar_repack %{nil}
 
