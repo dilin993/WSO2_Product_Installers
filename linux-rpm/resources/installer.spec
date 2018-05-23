@@ -30,18 +30,18 @@ cp -r %{_topdir}/SOURCES/%{_product_name}/* %{_topdir}/BUILD/
 %build
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d %{buildroot}%{_libdir}/WSO2/%{_titlet__}/%{_product_version}
-cp -r ./* %{buildroot}%{_libdir}/WSO2/%{_titlet__}/%{_product_version}
-chmod -R o+w %{buildroot}%{_libdir}/WSO2/%{_titlet__}/%{_product_version}
+install -d %{buildroot}%{_libdir}/WSO2/%{_title__}/%{_product_version}
+cp -r ./* %{buildroot}%{_libdir}/WSO2/%{_title__}/%{_product_version}
+chmod -R o+w %{buildroot}%{_libdir}/WSO2/%{_title__}/%{_product_version}
 
 %post
-ln -sf %{_libdir}/WSO2/%{_titlet__}/%{_product_version}/bin/wso2server.sh /usr/bin/%{_product__}-%{_product_version}
+ln -sf %{_libdir}/WSO2/%{_title__}/%{_product_version}/bin/wso2server.sh /usr/bin/%{_product__}-%{_product_version}
 # echo 'export BALLERINA_HOME=' >> /etc/profile.d/wso2.sh
 # chmod 0755 /etc/profile.d/wso2.sh
 
 %postun
 # sed -i.bak '\:SED_BALLERINA_HOME:d' /etc/profile.d/wso2.sh
-if [ "$(readlink /usr/bin/%{_product__}-%{_product_version})" = "%{_libdir}/%{_product__}/%{_product_name}/bin/wso2server.sh%{_libdir}/WSO2/%{_titlet__}/%{_product_version}/bin/wso2server.sh" ]
+if [ "$(readlink /usr/bin/%{_product__}-%{_product_version})" = "%{_libdir}/%{_product__}/%{_product_name}/bin/wso2server.sh%{_libdir}/WSO2/%{_title__}/%{_product_version}/bin/wso2server.sh" ]
 then
   rm -f /usr/bin/%{_product__}-%{_product_version}
 fi
@@ -51,5 +51,5 @@ rm -rf %{_topdir}/BUILD/*
 rm -rf %{buildroot}
 
 %files
-%{_libdir}/WSO2/%{_titlet__}/%{_product_version}
+%{_libdir}/WSO2/%{_title__}/%{_product_version}
 # %doc COPYRIGHT LICENSE README
