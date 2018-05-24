@@ -1,4 +1,4 @@
-#Product Pack Preperation for Linux
+# Product Pack Preperation for Linux
 
 1) Download the product pack.
 2) Download jre and extract.
