@@ -72,10 +72,6 @@ if [ -z "$TITLE" ]; then
     exit 1
 fi
 
-# if [ -z "$DISTRIBUTION" ]; then
-#     BUILD_ALL_DISTRIBUTIONS=true
-# fi
-
 
 PRODUCT_DISTRIBUTION_LOCATION=${PROD_PATH}
 PRODUCT_NAME=${PRODUCT}-${PRODUCT_VERSION}

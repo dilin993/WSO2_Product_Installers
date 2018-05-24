@@ -14,7 +14,7 @@ URL:            https://www.wso2.com/
 # Disable Automatic Dependencies
 AutoReqProv: no
 # Override RPM file name
-%define _rpmfilename %%{ARCH}/%{_product__}-%{_product_version}-runtime-linux-installer-x64-%{_product_version}.rpm
+%define _rpmfilename %%{ARCH}/%{_product__}-linux-installer-x64-%{_product_version}.rpm
 # Disable Jar repacking
 %define __jar_repack %{nil}
 
@@ -36,11 +36,8 @@ chmod -R o+w %{buildroot}%{_libdir}/WSO2/%{_title__}/%{_product_version}
 
 %post
 ln -sf %{_libdir}/WSO2/%{_title__}/%{_product_version}/bin/wso2server.sh /usr/bin/%{_product__}-%{_product_version}
-# echo 'export BALLERINA_HOME=' >> /etc/profile.d/wso2.sh
-# chmod 0755 /etc/profile.d/wso2.sh
 
 %postun
-# sed -i.bak '\:SED_BALLERINA_HOME:d' /etc/profile.d/wso2.sh
 if [ "$(readlink /usr/bin/%{_product__}-%{_product_version})" = "%{_libdir}/%{_product__}/%{_product_name}/bin/wso2server.sh%{_libdir}/WSO2/%{_title__}/%{_product_version}/bin/wso2server.sh" ]
 then
   rm -f /usr/bin/%{_product__}-%{_product_version}

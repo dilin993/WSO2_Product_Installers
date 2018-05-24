@@ -10,6 +10,8 @@ function printUsage() {
     echo "        path of the product distributions"
     echo "    -n (--name)"
     echo "        name of the product distributions"
+    echo "    -t (--title)"
+    echo "        title of the product distributions"
 }
 
 BUILD_ALL_DISTRIBUTIONS=false
@@ -31,6 +33,11 @@ case ${key} in
     ;;
     -n|--name)
     PRODUCT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -t|--title)
+    TITLE="$2"
     shift # past argument
     shift # past value
     ;;
@@ -59,10 +66,15 @@ if [ -z "$PRODUCT" ]; then
     exit 1
 fi
 
+if [ -z "$TITLE" ]; then
+    echo "Please enter the title of the product packs"
+    printUsage
+    exit 1
+fi
+
 
 PRODUCT_DISTRIBUTION_LOCATION=${DIST_PATH}
 PRODUCT_DIRECTORY=${PRODUCT}-${PRODUCT_VERSION}
-PRODUCT_INSTALL_DIRECTORY=${PRODUCT}-${PRODUCT_VERSION}
 
 echo "Build started at" $(date +"%Y-%m-%d %H:%M:%S")
 
@@ -76,7 +88,7 @@ function extractPack() {
     rm -rf target/original
     mkdir -p target/original
     unzip $1 -d target/original > /dev/null 2>&1
-    mv target/original/__MACOSX/$2 target/original/${PRODUCT_INSTALL_DIRECTORY}
+    mv target/original/__MACOSX/$2 target/original/${PRODUCT_DIRECTORY}
     rm -rf target/original/__MACOSX
 }
 
@@ -86,26 +98,21 @@ function createPackInstallationDirectory() {
 
     sed -i -e 's/__PRODUCT_VERSION__/'${PRODUCT_VERSION}'/g' target/darwin/scripts/postinstall
     sed -i -e 's/__PRODUCT__/'${PRODUCT}'/g' target/darwin/scripts/postinstall
+    sed -i -e 's/__TITLE__/'${TITLE}'/g' target/darwin/scripts/postinstall
     chmod -R 755 target/darwin/scripts/postinstall
 
     sed -i -e 's/__PRODUCT_VERSION__/'${PRODUCT_VERSION}'/g' target/darwin/Distribution
     sed -i -e 's/__PRODUCT__/'${PRODUCT}'/g' target/darwin/Distribution
+    sed -i -e 's/__TITLE__/'${TITLE}'/g' target/darwin/Distribution
     chmod -R 755 target/darwin/Distribution
 
     rm -rf target/darwinpkg
     mkdir -p target/darwinpkg
     chmod -R 755 target/darwinpkg
 
-    # mkdir -p target/darwinpkg/etc/paths.d
-    # chmod -R 755 target/darwinpkg/etc/paths.d
-
-    # echo "/Library/$PRODUCT/$PRODUCT-$PRODUCT_VERSION/bin" >> target/darwinpkg/etc/paths.d/$PRODUCT
-    # chmod -R 644 target/darwinpkg/etc/paths.d/$PRODUCT
-
-    mkdir -p target/darwinpkg/Library/$PRODUCT
-    chmod -R 755 target/darwinpkg/Library/$PRODUCT
-
-    mv target/original/${PRODUCT_INSTALL_DIRECTORY} target/darwinpkg/Library/$PRODUCT/
+    mkdir -p target/darwinpkg/Library/WSO2/$TITLE/$PRODUCT_VERSION
+    mv target/original/${PRODUCT_DIRECTORY}/* target/darwinpkg/Library/WSO2/$TITLE/$PRODUCT_VERSION
+    chmod -R 755 target/darwinpkg/Library/WSO2/$TITLE/$PRODUCT_VERSION
 
     rm -rf target/package
     mkdir -p target/package
@@ -146,8 +153,8 @@ function createInstaller() {
     extractPack "$PRODUCT_DISTRIBUTION_LOCATION/$PRODUCT-$PRODUCT_VERSION.zip" ${PRODUCT_DIRECTORY}
     createPackInstallationDirectory
     buildPackage
-    buildProduct $PRODUCT-$PRODUCT_VERSION-macos-installer-x64.pkg
-    signProduct $PRODUCT-$PRODUCT_VERSION-macos-installer-x64.pkg
+    buildProduct $PRODUCT-macos-installer-x64-$PRODUCT_VERSION.pkg
+    signProduct $PRODUCT-macos-installer-x64-$PRODUCT_VERSION.pkg
 }
 
 deleteTargetDirectory

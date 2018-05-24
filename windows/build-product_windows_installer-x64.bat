@@ -42,16 +42,9 @@ IF "%CERTLOC%"==""  (
 )
 
 IF "%DISTLOC%"==""  (
-	REM set DISTLOC=resources\dist
 	echo The syntax of the command is incorrect. Missing argument dist.
 	goto EOF
 )
-
-REM IF NOT "%DIST%"=="all" IF NOT "%DIST%"=="prodlerina-platform" IF NOT "%DIST%"=="prodlerina-runtime" (
-REM 	echo The syntax of the command is incorrect. Possible arguments for dist - all, prodlerina-platform, prodlerina-runtime.
-REM 	echo Ex: --dist prodlerina-platform
-REM 	goto EOF
-REM )
 
 IF "%PRODUCT_VERSION%"==""  (
 	echo The syntax of the command is incorrect. Missing argument version.
@@ -85,12 +78,11 @@ set PRODDIST=%PRODUCT%-%PRODUCT_VERSION%
 echo Product Version: %PRODDIST%"
 set PRODPARCH=x64
 set INSTALLERPARCH=amd64
-set MSI=%PRODUCT%-%PRODUCT_VERSION%-installer-%PRODPARCH%.msi
+set MSI=%PRODUCT%-windows-installer-%PRODPARCH%-%PRODUCT_VERSION%.msi
 call :createInstaller
 goto EOF
 
 :createInstaller
-rem jar -xf %PRODZIP%
 rmdir target\installer-resources /s /q >nul 2>&1
 powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('%PRODZIP%', '.'); }"
 xcopy  %ICONDIST% %PRODDIST%\icons /e /i >nul 2>&1

@@ -120,8 +120,8 @@ function createInstaller() {
     extractPack "$PRODUCT_DISTRIBUTION_LOCATION/$PRODUCT_NAME.zip" ${PRODUCT_NAME}
     createPackInstallationDirectory
     copyDebianDirectory
-    mv target/${PRODUCT_INSTALL_DIRECTORY} target/${PRODUCT_NAME}-linux-installer-x64
-    dpkg-deb --build target/${PRODUCT_NAME}-linux-installer-x64
+    mv target/${PRODUCT_INSTALL_DIRECTORY} target/${PRODUCT_NAME}-linux-installer-x64-${PRODUCT_VERSION}
+    dpkg-deb --build target/${PRODUCT_NAME}-linux-installer-x64-${PRODUCT_VERSION}
 }
 
 deleteTargetDirectory
